@@ -233,8 +233,8 @@ jobs:
       - run: yarn --cwd packages/zone.js/test/typings test
 
   saucelabs:
-    runs-on: ubuntu-latest
-    env: 
+    runs-on: ubuntu-latest-4core
+    env:
       SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
       SAUCE_USERNAME: ${{ vars.SAUCE_USERNAME }}
       SAUCE_TUNNEL_IDENTIFIER: angular-framework-${{ github.run_number }}
@@ -256,18 +256,18 @@ jobs:
       # test in all supported browsers on Saucelabs anyway until this job can be removed.
       - name: Preparing Bazel-generated fixtures required in legacy tests
         run: |
-            yarn bazel build //packages/core/test:downleveled_es5_fixture //packages/common/locales
-            # Needed for the ES5 downlevel reflector test in `packages/core/test/reflection`.
-            mkdir -p dist/legacy-test-out/core/test/reflection/
-            cp dist/bin/packages/core/test/reflection/es5_downleveled_inheritance_fixture.js \
-              dist/legacy-test-out/core/test/reflection/es5_downleveled_inheritance_fixture.js
-            # Locale files are needed for i18n tests running within Saucelabs. These are added
-            # directly as sources so that the TypeScript compilation of `/packages/tsconfig.json`
-            # can succeed. Note that the base locale and currencies files are checked-in, so
-            # we do not need to re-generate those through Bazel.
-            mkdir -p packages/common/locales/extra
-            cp dist/bin/packages/common/locales/*.ts packages/common/locales
-            cp dist/bin/packages/common/locales/extra/*.ts packages/common/locales/extra
+          yarn bazel build //packages/core/test:downleveled_es5_fixture //packages/common/locales
+          # Needed for the ES5 downlevel reflector test in `packages/core/test/reflection`.
+          mkdir -p dist/legacy-test-out/core/test/reflection/
+          cp dist/bin/packages/core/test/reflection/es5_downleveled_inheritance_fixture.js \
+            dist/legacy-test-out/core/test/reflection/es5_downleveled_inheritance_fixture.js
+          # Locale files are needed for i18n tests running within Saucelabs. These are added
+          # directly as sources so that the TypeScript compilation of `/packages/tsconfig.json`
+          # can succeed. Note that the base locale and currencies files are checked-in, so
+          # we do not need to re-generate those through Bazel.
+          mkdir -p packages/common/locales/extra
+          cp dist/bin/packages/common/locales/*.ts packages/common/locales
+          cp dist/bin/packages/common/locales/extra/*.ts packages/common/locales/extra
       - name: Build bundle of tests to run on Saucelabs
         run: node tools/legacy-saucelabs/build-saucelabs-test-bundle.mjs
       - name: Wait and confirm Saucelabs tunnel has connected
